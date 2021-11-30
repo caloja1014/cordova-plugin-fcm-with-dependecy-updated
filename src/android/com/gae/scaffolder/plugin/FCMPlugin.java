@@ -23,7 +23,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
-
 public class FCMPlugin extends CordovaPlugin {
     public static String notificationEventName = "notification";
     public static String tokenRefreshEventName = "tokenRefresh";
@@ -246,13 +245,23 @@ public class FCMPlugin extends CordovaPlugin {
             }
         });
     }
-
+    private String sanitize(String string) {
+        if (string == null) {
+          return "NULL";
+        }
+        String sanitized = string.replace('\n', '_').replace('\r', '_');
+        return sanitized;
+      }
+      
     private JSONObject exceptionToJson(final Exception exception) throws JSONException {
+        String message = sanitize(exception.getMessage());
+        String stackTrace = this.sanitize( exception.getStackTrace().toString());
+        String cause = this.sanitize( exception.getClass().getName());
         return new JSONObject() {
             {
-                put("message", exception.getMessage());
-                put("cause", exception.getClass().getName());
-                put("stacktrace", exception.getStackTrace().toString());
+                put("message",message);
+                put("cause",cause);
+                put("stacktrace",stackTrace);
             }
         };
     }
